@@ -4,7 +4,7 @@
    2.2. Įvedus ne, reikia pasirinkti kiek norėsite vesti studentų. Galima vesti tik skaičius.
    
 
-Pakeitimai buvo atliekami remiantis 2 strategija, kadangi joje rūšiavimas list tipo konteineryje pagerėjo dvigubai. Buvo pasirinkta modifikuoti vector tipo konteinerį su funkcija partition, kadangi ji parodė gerus rezultatus. Vector tipo konteineryje naudojant partition funkciją rūšiavimas pagal vidurkį pagreitėjo 8 kartus, o pagal pavardę pagreitėjo dvigubai.
+Pakeitimai buvo atliekami remiantis 2 strategija, kadangi joje rūšiavimas list tipo konteineryje pagerėjo dvigubai. Buvo pasirinkta modifikuoti vector tipo konteinerį su funkcija partition, kadangi ji parodė gerus rezultatus. Vector tipo konteineryje naudojant partition funkciją rūšiavimas pagal vidurkį pagreitėjo 8 kartus, o pagal pavardę pagreitėjo dvigubai. Tyrimas buvo atliktas nagrinėjant 1 000 000 studentų failą.
 
 Konteinerio tipas ir rūšiavimo kriterijus:
 

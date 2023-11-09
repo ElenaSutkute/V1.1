@@ -405,10 +405,10 @@ void StudentuSkirstymas(const string &sortingCriteria, const string &StorageType
     if (StorageType=="v"){
     vector<Duomenys<Container>> studentai;
 
-    ifstream infile("100000 studentu.txt");
+    ifstream infile("1000000 studentu.txt");
 
 
-    cout << "Skaitymas vyksta is failo su 100,000 studentu" << endl;
+    cout << "Skaitymas vyksta is failo su 1,000,000 studentu" << endl;
     cout << endl;
     if (!infile)
     {
@@ -484,21 +484,25 @@ void StudentuSkirstymas(const string &sortingCriteria, const string &StorageType
         return;
     }
 
+    vector<Duomenys<Container>> protingi;
+    vector<Duomenys<Container>> kiti;
+
     auto startFilter = chrono::high_resolution_clock::now();
 
-    auto partitionPoint = std::partition(studentai.begin(), studentai.end(),
-    [](const Duomenys<Container>& studentas) {
-        return studentas.vid < 5;
-    });
-
-    vector<Duomenys<Container>> kiti(studentai.begin(), partitionPoint);
-    vector<Duomenys<Container>> protingi(partitionPoint, studentai.end());
-
-    studentai.erase(partitionPoint, studentai.end());
-
+    for (const Duomenys<Container> &studentas : studentai)
+    {
+        if (studentas.vid < 5)
+        {
+            protingi.push_back(studentas);
+        }
+        else
+        {
+            kiti.push_back(studentas);
+        }
+    }
     auto endFilter = chrono::high_resolution_clock::now();
     chrono::duration<double> durationFilter = endFilter - startFilter;
-    cout << "duomenu rusiavimas paval vidurki truko " << durationFilter.count() << " sekundziu" << endl;
+    cout << "duomenu rusiavimas pagal vidurki truko " << durationFilter.count() << " sekundziu" << endl;
 
     auto startWriteVargsiukai = chrono::high_resolution_clock::now();
 
@@ -537,23 +541,13 @@ void StudentuSkirstymas(const string &sortingCriteria, const string &StorageType
     chrono::duration<double> durationWriteMoksliukai = endWriteMoksliukai - startWriteMoksliukai;
     cout << "duomenu isvedimas i Moksliuku studentu faila truko " << durationWriteMoksliukai.count() << " sekundziu" << endl;
 
-    ofstream Atrinkti("Atrinkti.txt");
-    Atrinkti << setw(15) << left << "Vardas" << setw(15) << left << "Pavarde"
-             << setw(20) << left << "Galutinis(Vid.)" << setw(20) << endl;
-    for (const Duomenys<Container> &studentas : studentai)
-    {
-        Atrinkti << setw(15) << left << studentas.vardas << setw(15) << left << studentas.pavarde
-                 << setw(20) << left << studentas.vid << setw(20) << endl;
-    }
-    Atrinkti.close();
-
     }
     else{
         list<Duomenys<Container>> studentai;
 
-    ifstream infile("100000 studentu.txt");
+    ifstream infile("1000000 studentu.txt");
 
-    cout << "Skaitymas vyksta is failo su 100,000 studentu" << endl;
+    cout << "Skaitymas vyksta is failo su 1,000,000 studentu" << endl;
     cout << endl;
     if (!infile)
     {
@@ -633,17 +627,15 @@ void StudentuSkirstymas(const string &sortingCriteria, const string &StorageType
 
     auto startFilter = chrono::high_resolution_clock::now();
 
-    for (auto it = studentai.begin(); it != studentai.end();)
+    for (const Duomenys<Container> &studentas : studentai)
     {
-        if (it->vid < 5)
+        if (studentas.vid < 5)
         {
-            protingi.push_back(*it);
-            it = studentai.erase(it);
+            protingi.push_back(studentas);
         }
         else
         {
-            kiti.push_back(*it);
-            ++it;
+            kiti.push_back(studentas);
         }
     }
 
@@ -686,15 +678,6 @@ void StudentuSkirstymas(const string &sortingCriteria, const string &StorageType
     auto endWriteMoksliukai = chrono::high_resolution_clock::now();
     chrono::duration<double> durationWriteMoksliukai = endWriteMoksliukai - startWriteMoksliukai;
     cout << "duomenu isvedimas i Moksliuku studentu faila truko " << durationWriteMoksliukai.count() << " sekundziu" << endl;
-
-    ofstream Atrinkti("Atrinkti.txt");
-    Atrinkti << setw(15) << left << "Vardas" << setw(15) << left << "Pavarde"
-             << setw(20) << left << "Galutinis(Vid.)" << setw(20) << endl;
-    for (const Duomenys<Container> &studentas : studentai)
-    {
-        Atrinkti << setw(15) << left << studentas.vardas << setw(15) << left << studentas.pavarde
-                 << setw(20) << left << studentas.vid << setw(20) << endl;
-    }
 
     }
 

@@ -8,18 +8,74 @@
 #include <string>
 #include <random>
 #include <chrono>
+#include <type_traits>
 
 using namespace std;
 
 template <typename Container>
-struct Duomenys
+class Duomenys
 {
+public:
+    Duomenys() : egz(0), vid(0), nd(nullptr) {}
+    ~Duomenys() { delete nd; }
+    Duomenys(const Duomenys& other);
+    Duomenys& operator=(const Duomenys& other);
+    Duomenys(Duomenys&& other) noexcept;
+    Duomenys& operator=(Duomenys&& other) noexcept;
+
     string vardas;
     string pavarde;
-    Container nd;
+    Container* nd;
     int egz;
-    double vid, med;
+    double vid;
 };
+
+template <typename Container>
+Duomenys<Container>::Duomenys(const Duomenys& other)
+    : vardas(other.vardas), pavarde(other.pavarde), egz(other.egz),
+      vid(other.vid)
+{
+    nd = new Container(*(other.nd));
+}
+
+template <typename Container>
+Duomenys<Container>& Duomenys<Container>::operator=(const Duomenys& other)
+{
+    if (this != &other)
+    {
+        delete nd;
+        vardas = other.vardas;
+        pavarde = other.pavarde;
+        egz = other.egz;
+        vid = other.vid;
+        nd = new Container(*(other.nd));
+    }
+    return *this;
+}
+
+template <typename Container>
+Duomenys<Container>::Duomenys(Duomenys&& other) noexcept
+    : vardas(std::move(other.vardas)), pavarde(std::move(other.pavarde)),
+      egz(other.egz), vid(other.vid), nd(other.nd)
+{
+    other.nd = nullptr;
+}
+
+template <typename Container>
+Duomenys<Container>& Duomenys<Container>::operator=(Duomenys&& other) noexcept
+{
+    if (this != &other)
+    {
+        delete nd;
+        vardas = std::move(other.vardas);
+        pavarde = std::move(other.pavarde);
+        egz = other.egz;
+        vid = other.vid;
+        nd = other.nd;
+        other.nd = nullptr;
+    }
+    return *this;
+}
 
 template <typename Container>
 vector<Duomenys<Container>> skaitytiDuomenisIsFailo();
@@ -40,6 +96,7 @@ void SortStudentsByGalutinis(vector<Duomenys<Container>> &students);
 template <typename Container>
 void SortStudentsByGalutinisList(list<Duomenys<Container>> &students);
 
+
 int main()
 {
     string ats;
@@ -54,7 +111,7 @@ int main()
             throw runtime_error("Error. Pasirinkite 'v' arba 'l'");
         }
     }
-    catch (const runtime_error &e)
+    catch (const runtime_error& e)
     {
         cerr << e.what() << endl;
         exit(EXIT_FAILURE);
@@ -62,21 +119,21 @@ int main()
 
     if (containerType == "v")
     {
-        cout<<"Ar generuoti failus?"<<endl;
-        cin>>ats;
+        cout << "Ar generuoti failus?" << endl;
+        cin >> ats;
         if (ats == "taip")
-            {
-                GeneruotiFailus<vector<int>>();
-            }
+        {
+            GeneruotiFailus<vector<int>>();
+        }
     }
     else if (containerType == "l")
     {
-        cout<<"Ar generuoti failus?"<<endl;
-        cin>>ats;
+        cout << "Ar generuoti failus?" << endl;
+        cin >> ats;
         if (ats == "taip")
-            {
-                GeneruotiFailus<list<int>>();
-            }
+        {
+            GeneruotiFailus<list<int>>();
+        }
     }
 
     string kriterijus;
@@ -114,7 +171,7 @@ int main()
             throw runtime_error("Error. Veskite tik 'taip' arba 'ne'");
         }
     }
-    catch (const runtime_error &e)
+    catch (const runtime_error& e)
     {
         cerr << e.what() << endl;
         exit(EXIT_FAILURE);
@@ -155,12 +212,13 @@ vector<Duomenys<Container>> skaitytiDuomenisIsFailo()
 {
     vector<Duomenys<Container>> studentai;
 
+
     ifstream infile("studentai.txt");
-    if (!infile)
-    {
-        cerr << "Error: Failo atidaryti nepavyko." << endl;
-        terminate();
-    }
+    if (!infile.is_open())
+        {
+            cerr << "Error: Failo atidaryti nepavyko." << endl;
+            terminate();
+        }
 
     string eile;
     getline(infile, eile);
@@ -169,6 +227,7 @@ vector<Duomenys<Container>> skaitytiDuomenisIsFailo()
     {
         lineNum++;
         Duomenys<Container> studentas;
+        studentas.nd = new Container();
         istringstream iss(eile);
         iss >> studentas.vardas >> studentas.pavarde;
 
@@ -186,7 +245,7 @@ vector<Duomenys<Container>> skaitytiDuomenisIsFailo()
             {
                 break;
             }
-            studentas.nd.push_back(pazimys);
+            studentas.nd->push_back(pazimys);
         }
 
         if (!iss.fail())
@@ -226,6 +285,7 @@ vector<Duomenys<Container>> ivestiDuomenisRanka()
     for (int studentIndex = 0; studentIndex < zmones; studentIndex++)
     {
         Duomenys<Container> studentas;
+        studentas.nd = new Container();
 
         cout << "Iveskite varda: ";
         cin >> studentas.vardas;
@@ -268,7 +328,7 @@ vector<Duomenys<Container>> ivestiDuomenisRanka()
                 {
                     cerr << e.what() << endl;
                 }
-                studentas.nd.push_back(pazimys);
+                studentas.nd->push_back(pazimys);
             }
             cout << "Iveskite egzamino rezultata: ";
             try
@@ -315,7 +375,7 @@ vector<Duomenys<Container>> ivestiDuomenisRanka()
             {
                 uniform_int_distribution<int> distribution(min, max);
                 int random_skaicius = distribution(generator);
-                studentas.nd.push_back(random_skaicius);
+                studentas.nd->push_back(random_skaicius);
                 cout << random_skaicius << endl;
             }
             uniform_int_distribution<int> distribution(min, max);
@@ -328,7 +388,6 @@ vector<Duomenys<Container>> ivestiDuomenisRanka()
     sort(studentai.begin(), studentai.end(), rusiavimas<Container>);
     return studentai;
 }
-
 
 template <typename Container>
 void spausdintiDuomenis(const vector<Duomenys<Container>> &studentai)
@@ -399,265 +458,264 @@ void GeneruotiFailus()
     }
 }
 
+
 template <typename Container>
 void StudentuSkirstymas(const string &sortingCriteria, const string &StorageType)
 {
-    if (StorageType=="v"){
-    vector<Duomenys<Container>> studentai;
-
-    ifstream infile("1000000 studentu.txt");
-
-
-    cout << "Skaitymas vyksta is failo su 1,000,000 studentu" << endl;
-    cout << endl;
-    if (!infile)
+    if (StorageType == "v")
     {
-        cerr << "Error: Failo atidaryti nepavyko." << endl;
-        terminate();
-    }
+        vector<Duomenys<Container>> studentai;
 
-    string eile;
-    getline(infile, eile);
-    int lineNum = 0;
-    auto startRead = chrono::high_resolution_clock::now();
-    while (getline(infile, eile))
-    {
-        lineNum++;
-        Duomenys<Container> studentas;
-        istringstream iss(eile);
-        iss >> studentas.vardas >> studentas.pavarde;
+        ifstream infile("10000 studentu.txt");
 
-        for (int i = 0; i < 7; i++)
+        cout << "Skaitymas vyksta is failo su 10,000 studentu" << endl;
+        cout << endl;
+        if (!infile)
         {
-            int pazimys;
-            iss >> pazimys;
-
-            if (iss.fail())
-            {
-                cerr << "Error skaitant " << lineNum << " studento pazymius." << endl;
-                break;
-            }
-            if (pazimys == -1)
-            {
-                break;
-            }
-            studentas.nd.push_back(pazimys);
+            cerr << "Error: Failo atidaryti nepavyko." << endl;
+            terminate();
         }
 
-        if (!iss.fail())
+        string eile;
+        getline(infile, eile);
+        int lineNum = 0;
+        auto startRead = chrono::high_resolution_clock::now();
+        while (getline(infile, eile))
         {
-            iss >> studentas.egz;
-            studentai.push_back(studentas);
+            lineNum++;
+            Duomenys<Container> studentas;
+            studentas.nd = new Container();
+            istringstream iss(eile);
+            iss >> studentas.vardas >> studentas.pavarde;
+
+            for (int i = 0; i < 7; i++)
+            {
+                int pazimys;
+                iss >> pazimys;
+
+                if (iss.fail())
+                {
+                    cerr << "Error skaitant " << lineNum << " studento pazymius." << endl;
+                    break;
+                }
+                if (pazimys == -1)
+                {
+                    break;
+                }
+                studentas.nd->push_back(pazimys);
+            }
+
+            if (!iss.fail())
+            {
+                iss >> studentas.egz;
+                studentai.push_back(studentas);
+            }
         }
-    }
-    infile.close();
+        infile.close();
 
-    auto endRead = chrono::high_resolution_clock::now();
-    chrono::duration<double> durationRead = endRead - startRead;
-    cout << "duomenu skaitymas is failo truko " << durationRead.count() << " sekundziu" << endl;
+        auto endRead = chrono::high_resolution_clock::now();
+        chrono::duration<double> durationRead = endRead - startRead;
+        cout << "duomenu skaitymas is failo truko " << durationRead.count() << " sekundziu" << endl;
 
-    for (Duomenys<Container> &studentas : studentai)
-    {
-        studentas.vid = round((0.4 * vidurkis<Container>(studentas.nd) + 0.6 * studentas.egz) * 100.0) / 100.0;
-    }
-    if (sortingCriteria == "p")
-    {
-
-        auto startSort = chrono::high_resolution_clock::now();
-        sort(studentai.begin(), studentai.end(), rusiavimas<Container>);
-        auto endSort = chrono::high_resolution_clock::now();
-        chrono::duration<double> durationSort = endSort - startSort;
-        cout << "duomenu rusiavimas pagal pavardes ir vardus funkcija sort truko " << durationSort.count() << " sekundziu" << endl;
-    }
-    else if (sortingCriteria == "v")
-    {
-
-        auto startSort = chrono::high_resolution_clock::now();
-        SortStudentsByGalutinis<Container>(studentai);
-        auto endSort = chrono::high_resolution_clock::now();
-        chrono::duration<double> durationSort = endSort - startSort;
-        cout << "duomenu skirstymas pagal vidurki truko " << durationSort.count() << " sekundziu" << endl;
-    }
-    else
-    {
-        cerr << "Neteisingai Ivestas rusiavimo kriterijus, veskite tik v/p" << endl;
-        return;
-    }
-
-    vector<Duomenys<Container>> protingi;
-    vector<Duomenys<Container>> kiti;
-
-    auto startFilter = chrono::high_resolution_clock::now();
-
-    for (const Duomenys<Container> &studentas : studentai)
-    {
-        if (studentas.vid < 5)
+        for (Duomenys<Container> &studentas : studentai)
         {
-            protingi.push_back(studentas);
+            studentas.vid = round((0.4 * vidurkis(studentas.nd) + 0.6 * studentas.egz) * 100.0) / 100.0;
+        }
+        if (sortingCriteria == "p")
+        {
+
+            auto startSort = chrono::high_resolution_clock::now();
+            sort(studentai.begin(), studentai.end(), rusiavimas<Container>);
+            auto endSort = chrono::high_resolution_clock::now();
+            chrono::duration<double> durationSort = endSort - startSort;
+            cout << "duomenu rusiavimas pagal pavardes ir vardus funkcija sort truko " << durationSort.count() << " sekundziu" << endl;
+        }
+        else if (sortingCriteria == "v")
+        {
+
+            auto startSort = chrono::high_resolution_clock::now();
+            SortStudentsByGalutinis<Container>(studentai);
+            auto endSort = chrono::high_resolution_clock::now();
+            chrono::duration<double> durationSort = endSort - startSort;
+            cout << "duomenu skirstymas pagal vidurki truko " << durationSort.count() << " sekundziu" << endl;
         }
         else
         {
-            kiti.push_back(studentas);
+            cerr << "Neteisingai Ivestas rusiavimo kriterijus, veskite tik v/p" << endl;
+            return;
         }
+
+        vector<Duomenys<Container>> protingi;
+
+        auto startFilter = chrono::high_resolution_clock::now();
+
+        auto partitionIt = partition(studentai.begin(), studentai.end(),
+                                      [](const Duomenys<Container> &studentas) {
+                                          return studentas.vid < 5;
+                                      });
+
+        protingi.insert(protingi.end(), make_move_iterator(partitionIt), make_move_iterator(studentai.end()));
+        studentai.erase(partitionIt, studentai.end());
+
+        auto endFilter = chrono::high_resolution_clock::now();
+        chrono::duration<double> durationFilter = endFilter - startFilter;
+
+        cout << "duomenu rusiavimas paval vidurki truko " << durationFilter.count() << " sekundziu" << endl;
+
+        auto startWriteVargsiukai = chrono::high_resolution_clock::now();
+
+        ofstream Vargsiukai("Vargsiukai.txt");
+        Vargsiukai << setw(15) << left << "Vardas" << setw(15) << left << "Pavarde"
+                   << setw(20) << left << "Galutinis(Vid.)" << setw(20) << endl;
+
+        for (const Duomenys<Container> &studentas : studentai)
+        {
+            Vargsiukai << setw(15) << left << studentas.vardas << setw(15) << left << studentas.pavarde
+                       << setw(20) << left << studentas.vid << setw(20) << endl;
+        }
+
+        Vargsiukai.close();
+
+        auto endWriteVargsiukai = chrono::high_resolution_clock::now();
+        chrono::duration<double> durationWriteVargsiukai = endWriteVargsiukai - startWriteVargsiukai;
+        cout << "duomenu isvedimas i Vargsiuku studentu faila truko " << durationWriteVargsiukai.count() << " sekundziu" << endl;
+
+        auto startWriteMoksliukai = chrono::high_resolution_clock::now();
+
+        ofstream Moksliukai("Moksliukai.txt");
+        Moksliukai << setw(15) << left << "Vardas" << setw(15) << left << "Pavarde"
+                   << setw(20) << left << "Galutinis(Vid.)" << setw(20) << endl;
+
+        for (const Duomenys<Container> &studentas : protingi)
+        {
+            Moksliukai << setw(15) << left << studentas.vardas << setw(15) << left << studentas.pavarde
+                       << setw(20) << left << studentas.vid << setw(20) << endl;
+        }
+
+        Moksliukai.close();
+
+        auto endWriteMoksliukai = chrono::high_resolution_clock::now();
+        chrono::duration<double> durationWriteMoksliukai = endWriteMoksliukai - startWriteMoksliukai;
+        cout << "duomenu isvedimas i Moksliuku studentu faila truko " << durationWriteMoksliukai.count() << " sekundziu" << endl;
     }
-    auto endFilter = chrono::high_resolution_clock::now();
-    chrono::duration<double> durationFilter = endFilter - startFilter;
-    cout << "duomenu rusiavimas pagal vidurki truko " << durationFilter.count() << " sekundziu" << endl;
-
-    auto startWriteVargsiukai = chrono::high_resolution_clock::now();
-
-    ofstream Vargsiukai("Vargsiukai.txt");
-    Vargsiukai << setw(15) << left << "Vardas" << setw(15) << left << "Pavarde"
-               << setw(20) << left << "Galutinis(Vid.)" << setw(20) << endl;
-
-    for (const Duomenys<Container> &studentas : kiti)
+    else
     {
-        Vargsiukai << setw(15) << left << studentas.vardas << setw(15) << left << studentas.pavarde
-                   << setw(20) << left << studentas.vid << setw(20) << endl;
-    }
-
-    Vargsiukai.close();
-
-    auto endWriteVargsiukai = chrono::high_resolution_clock::now();
-    chrono::duration<double> durationWriteVargsiukai = endWriteVargsiukai - startWriteVargsiukai;
-    cout << "duomenu isvedimas i Vargsiuku studentu faila truko " << durationWriteVargsiukai.count() << " sekundziu" << endl;
-
-    auto startWriteMoksliukai = chrono::high_resolution_clock::now();
-
-    ofstream Moksliukai("Moksliukai.txt");
-    Moksliukai << setw(15) << left << "Vardas" << setw(15) << left << "Pavarde"
-               << setw(20) << left << "Galutinis(Vid.)" << setw(20) << endl;
-
-    for (const Duomenys<Container> &studentas : protingi)
-    {
-        Moksliukai << setw(15) << left << studentas.vardas << setw(15) << left << studentas.pavarde
-                   << setw(20) << left << studentas.vid << setw(20) << endl;
-    }
-
-    Moksliukai.close();
-
-
-    auto endWriteMoksliukai = chrono::high_resolution_clock::now();
-    chrono::duration<double> durationWriteMoksliukai = endWriteMoksliukai - startWriteMoksliukai;
-    cout << "duomenu isvedimas i Moksliuku studentu faila truko " << durationWriteMoksliukai.count() << " sekundziu" << endl;
-
-    }
-    else{
         list<Duomenys<Container>> studentai;
 
-    ifstream infile("1000000 studentu.txt");
+        ifstream infile("10000 studentu.txt");
 
-    cout << "Skaitymas vyksta is failo su 1,000,000 studentu" << endl;
-    cout << endl;
-    if (!infile)
-    {
-        cerr << "Error: Failo atidaryti nepavyko." << endl;
-        terminate();
-    }
-
-    string eile;
-    getline(infile, eile);
-    int lineNum = 0;
-    auto startRead = chrono::high_resolution_clock::now();
-    while (getline(infile, eile))
-    {
-        lineNum++;
-        Duomenys<Container> studentas;
-        istringstream iss(eile);
-        iss >> studentas.vardas >> studentas.pavarde;
-
-        for (int i = 0; i < 7; i++)
+        cout << "Skaitymas vyksta is failo su 10,000 studentu" << endl;
+        cout << endl;
+        if (!infile)
         {
-            int pazimys;
-            iss >> pazimys;
-
-            if (iss.fail())
-            {
-                cerr << "Error skaitant " << lineNum << " studento pazymius." << endl;
-                break;
-            }
-            if (pazimys == -1)
-            {
-                break;
-            }
-            studentas.nd.push_back(pazimys);
+            cerr << "Error: Failo atidaryti nepavyko." << endl;
+            terminate();
         }
 
-        if (!iss.fail())
+        string eile;
+        getline(infile, eile);
+        int lineNum = 0;
+        auto startRead = chrono::high_resolution_clock::now();
+        while (getline(infile, eile))
         {
-            iss >> studentas.egz;
-            studentai.push_back(studentas);
+            lineNum++;
+            Duomenys<Container> studentas;
+            studentas.nd = new Container();
+            istringstream iss(eile);
+            iss >> studentas.vardas >> studentas.pavarde;
+
+            for (int i = 0; i < 7; i++)
+            {
+                int pazimys;
+                iss >> pazimys;
+
+                if (iss.fail())
+                {
+                    cerr << "Error skaitant " << lineNum << " studento pazymius." << endl;
+                    break;
+                }
+                if (pazimys == -1)
+                {
+                    break;
+                }
+                studentas.nd->push_back(pazimys);
+            }
+
+            if (!iss.fail())
+            {
+                iss >> studentas.egz;
+                studentai.push_back(studentas);
+            }
         }
-    }
-    infile.close();
+        infile.close();
 
-    auto endRead = chrono::high_resolution_clock::now();
-    chrono::duration<double> durationRead = endRead - startRead;
-    cout << "duomenu skaitymas is failo truko " << durationRead.count() << " sekundziu" << endl;
+        auto endRead = chrono::high_resolution_clock::now();
+        chrono::duration<double> durationRead = endRead - startRead;
+        cout << "duomenu skaitymas is failo truko " << durationRead.count() << " sekundziu" << endl;
 
-    for (Duomenys<Container> &studentas : studentai)
-    {
-        studentas.vid = round((0.4 * vidurkis<Container>(studentas.nd) + 0.6 * studentas.egz) * 100.0) / 100.0;
-    }
-
-    if (sortingCriteria == "p")
-    {
-        auto startSort = chrono::high_resolution_clock::now();
-        studentai.sort(rusiavimas<Container>);
-        auto endSort = chrono::high_resolution_clock::now();
-        chrono::duration<double> durationSort = endSort - startSort;
-        cout << "duomenu rusiavimas pagal pavardes ir vardus funkcija sort truko " << durationSort.count() << " sekundziu" << endl;
-    }
-    else if (sortingCriteria == "v")
-    {
-        auto startSort = chrono::high_resolution_clock::now();
-        SortStudentsByGalutinisList<Container>(studentai);
-        auto endSort = chrono::high_resolution_clock::now();
-        chrono::duration<double> durationSort = endSort - startSort;
-        cout << "duomenu skirstymas pagal vidurki truko " << durationSort.count() << " sekundziu" << endl;
-    }
-    else
-    {
-        cerr << "Neteisingai Ivestas rusiavimo kriterijus, veskite tik v/p" << endl;
-        return;
-    }
-
-    list<Duomenys<Container>> protingi;
-    list<Duomenys<Container>> kiti;
-
-    auto startFilter = chrono::high_resolution_clock::now();
-
-    for (const Duomenys<Container> &studentas : studentai)
-    {
-        if (studentas.vid < 5)
+        for (Duomenys<Container> &studentas : studentai)
         {
-            protingi.push_back(studentas);
+            studentas.vid = round((0.4 * vidurkis(studentas.nd) + 0.6 * studentas.egz) * 100.0) / 100.0;
+        }
+
+        if (sortingCriteria == "p")
+        {
+            auto startSort = chrono::high_resolution_clock::now();
+            studentai.sort(rusiavimas<Container>);
+            auto endSort = chrono::high_resolution_clock::now();
+            chrono::duration<double> durationSort = endSort - startSort;
+            cout << "duomenu rusiavimas pagal pavardes ir vardus funkcija sort truko " << durationSort.count() << " sekundziu" << endl;
+        }
+        else if (sortingCriteria == "v")
+        {
+            auto startSort = chrono::high_resolution_clock::now();
+            SortStudentsByGalutinisList<Container>(studentai);
+            auto endSort = chrono::high_resolution_clock::now();
+            chrono::duration<double> durationSort = endSort - startSort;
+            cout << "duomenu skirstymas pagal vidurki truko " << durationSort.count() << " sekundziu" << endl;
         }
         else
         {
-            kiti.push_back(studentas);
+            cerr << "Neteisingai Ivestas rusiavimo kriterijus, veskite tik v/p" << endl;
+            return;
         }
-    }
 
-    auto endFilter = chrono::high_resolution_clock::now();
-    chrono::duration<double> durationFilter = endFilter - startFilter;
-    cout << "duomenu rusiavimas pagal vidurki truko " << durationFilter.count() << " sekundziu" << endl;
+        list<Duomenys<Container>> protingi;
+        list<Duomenys<Container>> kiti;
 
-    auto startWriteVargsiukai = chrono::high_resolution_clock::now();
+        auto startFilter = chrono::high_resolution_clock::now();
 
-    ofstream Vargsiukai("Vargsiukai.txt");
-    Vargsiukai << setw(15) << left << "Vardas" << setw(15) << left << "Pavarde"
-               << setw(20) << left << "Galutinis(Vid.)" << setw(20) << endl;
+        for (auto it = studentai.begin(); it != studentai.end();)
+        {
+            if (it->vid < 5)
+            {
+                protingi.push_back(*it);
+                it = studentai.erase(it);
+            }
+            else
+            {
+                ++it;
+            }
+        }
 
-    for (const Duomenys<Container> &studentas : protingi)
-    {
-        Vargsiukai << setw(15) << left << studentas.vardas << setw(15) << left << studentas.pavarde
-                   << setw(20) << left << studentas.vid << setw(20) << endl;
-    }
+        auto endFilter = chrono::high_resolution_clock::now();
+        chrono::duration<double> durationFilter = endFilter - startFilter;
+        cout << "duomenu rusiavimas pagal vidurki truko " << durationFilter.count() << " sekundziu" << endl;
 
-    Vargsiukai.close();
+        auto startWriteVargsiukai = chrono::high_resolution_clock::now();
 
-    auto endWriteVargsiukai = chrono::high_resolution_clock::now();
+        ofstream Vargsiukai("Vargsiukai.txt");
+        Vargsiukai << setw(15) << left << "Vardas" << setw(15) << left << "Pavarde"
+                   << setw(20) << left << "Galutinis(Vid.)" << setw(20) << endl;
+
+        for (const Duomenys<Container> &studentas : protingi)
+        {
+            Vargsiukai << setw(15) << left << studentas.vardas << setw(15) << left << studentas.pavarde
+                       << setw(20) << left << studentas.vid << setw(20) << endl;
+        }
+
+        Vargsiukai.close();
+            auto endWriteVargsiukai = chrono::high_resolution_clock::now();
     chrono::duration<double> durationWriteVargsiukai = endWriteVargsiukai - startWriteVargsiukai;
     cout << "duomenu isvedimas i Vargsiuku studentu faila truko " << durationWriteVargsiukai.count() << " sekundziu" << endl;
 
@@ -667,7 +725,7 @@ void StudentuSkirstymas(const string &sortingCriteria, const string &StorageType
     Moksliukai << setw(15) << left << "Vardas" << setw(15) << left << "Pavarde"
                << setw(20) << left << "Galutinis(Vid.)" << setw(20) << endl;
 
-    for (const Duomenys<Container> &studentas : kiti)
+    for (const Duomenys<Container> &studentas : studentai)
     {
         Moksliukai << setw(15) << left << studentas.vardas << setw(15) << left << studentas.pavarde
                    << setw(20) << left << studentas.vid << setw(20) << endl;
@@ -678,6 +736,7 @@ void StudentuSkirstymas(const string &sortingCriteria, const string &StorageType
     auto endWriteMoksliukai = chrono::high_resolution_clock::now();
     chrono::duration<double> durationWriteMoksliukai = endWriteMoksliukai - startWriteMoksliukai;
     cout << "duomenu isvedimas i Moksliuku studentu faila truko " << durationWriteMoksliukai.count() << " sekundziu" << endl;
+
 
     }
 
@@ -689,7 +748,9 @@ double vidurkis(const Container &vektorius)
     double suma = 0.0;
     int kiekis = 0;
 
-    for (const auto &element : vektorius)
+    const auto& actualContainer = *vektorius;
+
+    for (const auto &element : actualContainer)
     {
         suma += element;
         kiekis++;
@@ -702,6 +763,7 @@ double vidurkis(const Container &vektorius)
 
     return suma / kiekis;
 }
+
 
 
 template <typename Container>
@@ -719,17 +781,19 @@ bool rusiavimas(const Duomenys<Container> &a, const Duomenys<Container> &b)
     return vardas1 < vardas2;
 }
 
+
 template <typename Container>
 void SortStudentsByGalutinis(vector<Duomenys<Container>> &students)
 {
     sort(students.begin(), students.end(), [](const Duomenys<Container> &a, const Duomenys<Container> &b) {
-        return a.vid < b.vid;
+        return (vidurkis(a.nd) * 0.4 + a.egz * 0.6) < (vidurkis(b.nd) * 0.4 + b.egz * 0.6);
     });
 }
+
 template <typename Container>
 void SortStudentsByGalutinisList(list<Duomenys<Container>> &students)
 {
     students.sort([](const Duomenys<Container> &a, const Duomenys<Container> &b) {
-        return a.vid < b.vid;
+        return (vidurkis(a.nd) * 0.4 + a.egz * 0.6) < (vidurkis(b.nd) * 0.4 + b.egz * 0.6);
     });
 }

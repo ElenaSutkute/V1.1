@@ -12,16 +12,87 @@
 
 using namespace std;
 
-template <typename Container>
-class Duomenys
+class Zmogus
 {
 public:
+    virtual ~Zmogus() {}
+    virtual void SpausdintiInformacija() const = 0;
+};
+
+template <typename Container>
+class Duomenys : public Zmogus
+{
+public:
+    Duomenys() : egz(0), vid(0), nd(nullptr) {}
+    ~Duomenys() { delete nd; }
+    Duomenys(const Duomenys& other);
+    Duomenys& operator=(const Duomenys& other);
+    Duomenys(Duomenys&& other) noexcept;
+    Duomenys& operator=(Duomenys&& other) noexcept;
+
+    void SpausdintiInformacija() const override;
+
     string vardas;
     string pavarde;
-    Container nd;
+    Container* nd;
     int egz;
-    double vid, med;
+    double vid;
 };
+
+template <typename Container>
+Duomenys<Container>::Duomenys(const Duomenys& other)
+    : vardas(other.vardas), pavarde(other.pavarde), egz(other.egz),
+      vid(other.vid)
+{
+    nd = new Container(*(other.nd));
+}
+
+template <typename Container>
+Duomenys<Container>& Duomenys<Container>::operator=(const Duomenys& other)
+{
+    if (this != &other)
+    {
+        delete nd;
+        vardas = other.vardas;
+        pavarde = other.pavarde;
+        egz = other.egz;
+        vid = other.vid;
+        nd = new Container(*(other.nd));
+    }
+    return *this;
+}
+
+template <typename Container>
+Duomenys<Container>::Duomenys(Duomenys&& other) noexcept
+    : vardas(std::move(other.vardas)), pavarde(std::move(other.pavarde)),
+      egz(other.egz), vid(other.vid), nd(other.nd)
+{
+    other.nd = nullptr;
+}
+
+template <typename Container>
+Duomenys<Container>& Duomenys<Container>::operator=(Duomenys&& other) noexcept
+{
+    if (this != &other)
+    {
+        delete nd;
+        vardas = std::move(other.vardas);
+        pavarde = std::move(other.pavarde);
+        egz = other.egz;
+        vid = other.vid;
+        nd = other.nd;
+        other.nd = nullptr;
+    }
+    return *this;
+}
+
+
+template <typename Container>
+void Duomenys<Container>::SpausdintiInformacija() const
+{
+    cout << setw(15) << left << pavarde << setw(15) << left << vardas;
+}
+
 
 template <typename Container>
 vector<Duomenys<Container>> skaitytiDuomenisIsFailo();
@@ -42,6 +113,7 @@ void SortStudentsByGalutinis(vector<Duomenys<Container>> &students);
 template <typename Container>
 void SortStudentsByGalutinisList(list<Duomenys<Container>> &students);
 
+
 int main()
 {
     string ats;
@@ -56,7 +128,7 @@ int main()
             throw runtime_error("Error. Pasirinkite 'v' arba 'l'");
         }
     }
-    catch (const runtime_error &e)
+    catch (const runtime_error& e)
     {
         cerr << e.what() << endl;
         exit(EXIT_FAILURE);
@@ -116,7 +188,7 @@ int main()
             throw runtime_error("Error. Veskite tik 'taip' arba 'ne'");
         }
     }
-    catch (const runtime_error &e)
+    catch (const runtime_error& e)
     {
         cerr << e.what() << endl;
         exit(EXIT_FAILURE);
@@ -152,11 +224,11 @@ int main()
     return 0;
 }
 
-
 template <typename Container>
 vector<Duomenys<Container>> skaitytiDuomenisIsFailo()
 {
     vector<Duomenys<Container>> studentai;
+
 
     ifstream infile("studentai.txt");
     if (!infile.is_open())
@@ -172,6 +244,7 @@ vector<Duomenys<Container>> skaitytiDuomenisIsFailo()
     {
         lineNum++;
         Duomenys<Container> studentas;
+        studentas.nd = new Container();
         istringstream iss(eile);
         iss >> studentas.vardas >> studentas.pavarde;
 
@@ -189,7 +262,7 @@ vector<Duomenys<Container>> skaitytiDuomenisIsFailo()
             {
                 break;
             }
-            studentas.nd.push_back(pazimys);
+            studentas.nd->push_back(pazimys);
         }
 
         if (!iss.fail())
@@ -229,6 +302,7 @@ vector<Duomenys<Container>> ivestiDuomenisRanka()
     for (int studentIndex = 0; studentIndex < zmones; studentIndex++)
     {
         Duomenys<Container> studentas;
+        studentas.nd = new Container();
 
         cout << "Iveskite varda: ";
         cin >> studentas.vardas;
@@ -271,7 +345,7 @@ vector<Duomenys<Container>> ivestiDuomenisRanka()
                 {
                     cerr << e.what() << endl;
                 }
-                studentas.nd.push_back(pazimys);
+                studentas.nd->push_back(pazimys);
             }
             cout << "Iveskite egzamino rezultata: ";
             try
@@ -318,7 +392,7 @@ vector<Duomenys<Container>> ivestiDuomenisRanka()
             {
                 uniform_int_distribution<int> distribution(min, max);
                 int random_skaicius = distribution(generator);
-                studentas.nd.push_back(random_skaicius);
+                studentas.nd->push_back(random_skaicius);
                 cout << random_skaicius << endl;
             }
             uniform_int_distribution<int> distribution(min, max);
@@ -345,10 +419,12 @@ void spausdintiDuomenis(const vector<Duomenys<Container>> &studentai)
 
     for (const Duomenys<Container> &studentas : studentai)
     {
-        cout << setw(15) << left << studentas.pavarde << setw(15) << left << studentas.vardas;
+        studentas.SpausdintiInformacija();
         cout << setw(20) << left << round((0.4 * vidurkis(studentas.nd) + 0.6 * studentas.egz) * 100.0) / 100.0 << endl;
     }
 }
+
+
 
 template <typename Container>
 void GeneruotiFailus()
@@ -409,9 +485,9 @@ void StudentuSkirstymas(const string &sortingCriteria, const string &StorageType
     {
         vector<Duomenys<Container>> studentai;
 
-        ifstream infile("100000 studentu.txt");
+        ifstream infile("10000 studentu.txt");
 
-        cout << "Skaitymas vyksta is failo su 100,000 studentu" << endl;
+        cout << "Skaitymas vyksta is failo su 10,000 studentu" << endl;
         cout << endl;
         if (!infile)
         {
@@ -427,6 +503,7 @@ void StudentuSkirstymas(const string &sortingCriteria, const string &StorageType
         {
             lineNum++;
             Duomenys<Container> studentas;
+            studentas.nd = new Container();
             istringstream iss(eile);
             iss >> studentas.vardas >> studentas.pavarde;
 
@@ -444,7 +521,7 @@ void StudentuSkirstymas(const string &sortingCriteria, const string &StorageType
                 {
                     break;
                 }
-                studentas.nd.push_back(pazimys);
+                studentas.nd->push_back(pazimys);
             }
 
             if (!iss.fail())
@@ -544,9 +621,9 @@ void StudentuSkirstymas(const string &sortingCriteria, const string &StorageType
     {
         list<Duomenys<Container>> studentai;
 
-        ifstream infile("1000000 studentu.txt");
+        ifstream infile("10000 studentu.txt");
 
-        cout << "Skaitymas vyksta is failo su 1,000,000 studentu" << endl;
+        cout << "Skaitymas vyksta is failo su 10,000 studentu" << endl;
         cout << endl;
         if (!infile)
         {
@@ -562,6 +639,7 @@ void StudentuSkirstymas(const string &sortingCriteria, const string &StorageType
         {
             lineNum++;
             Duomenys<Container> studentas;
+            studentas.nd = new Container();
             istringstream iss(eile);
             iss >> studentas.vardas >> studentas.pavarde;
 
@@ -579,7 +657,7 @@ void StudentuSkirstymas(const string &sortingCriteria, const string &StorageType
                 {
                     break;
                 }
-                studentas.nd.push_back(pazimys);
+                studentas.nd->push_back(pazimys);
             }
 
             if (!iss.fail())
@@ -649,7 +727,7 @@ void StudentuSkirstymas(const string &sortingCriteria, const string &StorageType
         Vargsiukai << setw(15) << left << "Vardas" << setw(15) << left << "Pavarde"
                    << setw(20) << left << "Galutinis(Vid.)" << setw(20) << endl;
 
-        for (const Duomenys<Container> &studentas : studentai)
+        for (const Duomenys<Container> &studentas : protingi)
         {
             Vargsiukai << setw(15) << left << studentas.vardas << setw(15) << left << studentas.pavarde
                        << setw(20) << left << studentas.vid << setw(20) << endl;
@@ -689,7 +767,9 @@ double vidurkis(const Container &vektorius)
     double suma = 0.0;
     int kiekis = 0;
 
-    for (const auto &element : vektorius)
+    const auto& actualContainer = *vektorius;
+
+    for (const auto &element : actualContainer)
     {
         suma += element;
         kiekis++;

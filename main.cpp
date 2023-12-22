@@ -15,8 +15,14 @@ using namespace std;
 class Zmogus
 {
 public:
-    virtual ~Zmogus() {}
+    
+    virtual ~Zmogus() = default;
+    virtual string getVardas() const = 0;
+    virtual string getPavarde() const = 0;
+    virtual int getEgz() const = 0;
+    virtual double getVid() const = 0;
     virtual void SpausdintiInformacija() const = 0;
+
 };
 
 template <typename Container>
@@ -37,6 +43,11 @@ public:
     Container* nd;
     int egz;
     double vid;
+
+    string getVardas() const override { return vardas; }
+    string getPavarde() const override { return pavarde; }
+    int getEgz() const override { return egz; }
+    double getVid() const override { return vid; }
 };
 
 template <typename Container>

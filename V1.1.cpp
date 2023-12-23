@@ -10,12 +10,36 @@
 #include <chrono>
 #include <type_traits>
 
+
 using namespace std;
 
 template <typename Container>
 class Duomenys
 {
 public:
+    Duomenys() : egz(0), vid(0.0), med(0.0) {}
+    Duomenys(const string &vardas, const string &pavarde, const Container &nd, int egz)
+        : vardas(vardas), pavarde(pavarde), nd(nd), egz(egz), vid(0.0), med(0.0) {}
+
+    ~Duomenys() {}
+
+    string getVardas() const {
+        return vardas;
+    }
+
+    string getPavarde() const {
+        return pavarde;
+    }
+
+    void setVardas(const string &newVardas) {
+        vardas = newVardas;
+    }
+
+    void setPavarde(const string &newPavarde) {
+        pavarde = newPavarde;
+    }
+
+private:
     string vardas;
     string pavarde;
     Container nd;
@@ -23,24 +47,34 @@ public:
     double vid, med;
 };
 
+
 template <typename Container>
 vector<Duomenys<Container>> skaitytiDuomenisIsFailo();
+
 template <typename Container>
 void spausdintiDuomenis(const vector<Duomenys<Container>> &studentai);
+
 template <typename Container>
 vector<Duomenys<Container>> ivestiDuomenisRanka();
+
 template <typename Container>
 void StudentuSkirstymas(const string &sortingCriteria, const string &StorageType);
+
 template <typename Container>
 void GeneruotiFailus();
+
 template <typename Container>
 double vidurkis(const Container &vektorius);
+
 template <typename Container>
 bool rusiavimas(const Duomenys<Container> &a, const Duomenys<Container> &b);
+
 template <typename Container>
 void SortStudentsByGalutinis(vector<Duomenys<Container>> &students);
+
 template <typename Container>
 void SortStudentsByGalutinisList(list<Duomenys<Container>> &students);
+
 
 int main()
 {

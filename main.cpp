@@ -17,9 +17,9 @@ template <typename Container>
 class Duomenys
 {
 public:
-    Duomenys() : egz(0), vid(0.0), med(0.0) {}
+    Duomenys() : egz(0), vid(0.0) {}
     Duomenys(const string &vardas, const string &pavarde, const Container &nd, int egz)
-        : vardas(vardas), pavarde(pavarde), nd(nd), egz(egz), vid(0.0), med(0.0) {}
+        : vardas(vardas), pavarde(pavarde), nd(nd), egz(egz), vid(0.0) {}
 
     ~Duomenys() {}
 
@@ -70,7 +70,7 @@ private:
     string pavarde;
     Container nd;
     int egz;
-    double vid, med;
+    double vid;
 };
 
 
@@ -295,10 +295,14 @@ vector<Duomenys<Container>> ivestiDuomenisRanka()
     {
         Duomenys<Container> studentas;
 
+        string vardas, pavarde;
+
         cout << "Iveskite varda: ";
-        cin >> studentas.vardas;
+        cin >> vardas;
+        studentas.setVardas(vardas);
         cout << "Iveskite pavarde: ";
-        cin >> studentas.pavarde;
+        cin >> pavarde;
+        studentas.setPavarde(pavarde);
 
         cout << "Ar norite ivesti savo pazymius? Atsakymas: taip arba ne" << endl;
         try
@@ -336,12 +340,14 @@ vector<Duomenys<Container>> ivestiDuomenisRanka()
                 {
                     cerr << e.what() << endl;
                 }
-                studentas.nd.push_back(pazimys);
+                studentas.addScore(pazimys);
             }
             cout << "Iveskite egzamino rezultata: ";
             try
             {
-                cin >> studentas.egz;
+                int egz;
+                cin >> egz;
+                studentas.setEgz(egz);
                 if (cin.fail())
                 {
                     cin.clear();
@@ -383,12 +389,13 @@ vector<Duomenys<Container>> ivestiDuomenisRanka()
             {
                 uniform_int_distribution<int> distribution(min, max);
                 int random_skaicius = distribution(generator);
-                studentas.nd.push_back(random_skaicius);
+                studentas.addScore(random_skaicius);
                 cout << random_skaicius << endl;
             }
             uniform_int_distribution<int> distribution(min, max);
-            studentas.egz = distribution(generator);
-            cout << "Egzamino pazimys: " << studentas.egz << endl;
+            int egz = distribution(generator);
+            studentas.setEgz(egz);
+            cout << "Egzamino pazimys: " << studentas.getEgz() << endl;
         }
 
         studentai.push_back(studentas);
@@ -475,9 +482,9 @@ void StudentuSkirstymas(const string &sortingCriteria, const string &StorageType
     {
         vector<Duomenys<Container>> studentai;
 
-        ifstream infile("100000 studentu.txt");
+        ifstream infile("10000 studentu.txt");
 
-        cout << "Skaitymas vyksta is failo su 100,000 studentu" << endl;
+        cout << "Skaitymas vyksta is failo su 10,000 studentu" << endl;
         cout << endl;
         if (!infile)
         {
@@ -617,9 +624,9 @@ void StudentuSkirstymas(const string &sortingCriteria, const string &StorageType
     {
         list<Duomenys<Container>> studentai;
 
-        ifstream infile("1000000 studentu.txt");
+        ifstream infile("10000 studentu.txt");
 
-        cout << "Skaitymas vyksta is failo su 1,000,000 studentu" << endl;
+        cout << "Skaitymas vyksta is failo su 10,000 studentu" << endl;
         cout << endl;
         if (!infile)
         {
@@ -786,10 +793,10 @@ double vidurkis(const Container &vektorius)
 template <typename Container>
 bool rusiavimas(const Duomenys<Container> &a, const Duomenys<Container> &b)
 {
-    string vardas1 = a.vardas;
-    string vardas2 = b.vardas;
-    string pavarde1 = a.pavarde;
-    string pavarde2 = b.pavarde;
+    string vardas1 = a.getVardas();
+    string vardas2 = b.getVardas();
+    string pavarde1 = a.getPavarde();
+    string pavarde2 = b.getPavarde();
 
     if (vardas1 == vardas2)
     {
@@ -803,7 +810,7 @@ template <typename Container>
 void SortStudentsByGalutinis(vector<Duomenys<Container>> &students)
 {
     sort(students.begin(), students.end(), [](const Duomenys<Container> &a, const Duomenys<Container> &b) {
-        return (vidurkis(a.nd) * 0.4 + a.egz * 0.6) < (vidurkis(b.nd) * 0.4 + b.egz * 0.6);
+        return (vidurkis(a.getNd()) * 0.4 + a.getEgz() * 0.6) > (vidurkis(b.getNd()) * 0.4 + b.getEgz() * 0.6);
     });
 }
 
@@ -811,6 +818,6 @@ template <typename Container>
 void SortStudentsByGalutinisList(list<Duomenys<Container>> &students)
 {
     students.sort([](const Duomenys<Container> &a, const Duomenys<Container> &b) {
-        return (vidurkis(a.nd) * 0.4 + a.egz * 0.6) < (vidurkis(b.nd) * 0.4 + b.egz * 0.6);
+        return (vidurkis(a.getNd()) * 0.4 + a.getEgz() * 0.6) > (vidurkis(b.getNd()) * 0.4 + b.getEgz() * 0.6);
     });
 }

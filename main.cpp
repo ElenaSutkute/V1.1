@@ -23,12 +23,25 @@ public:
 
     ~Duomenys() {}
 
+
     string getVardas() const {
         return vardas;
     }
 
     string getPavarde() const {
         return pavarde;
+    }
+
+    const Container& getNd() const {
+        return nd;
+    }
+
+    int getEgz() const {
+        return egz;
+    }
+
+    double getVid() const {
+        return vid;
     }
 
     void setVardas(const string &newVardas) {
@@ -38,6 +51,19 @@ public:
     void setPavarde(const string &newPavarde) {
         pavarde = newPavarde;
     }
+
+    void setEgz(int newEgz) {
+    egz = newEgz;
+    }
+
+    void setVid(double newVid) {
+        vid = newVid;
+    }
+
+    void addScore(int score) {
+        nd.push_back(score);
+    }
+
 
 private:
     string vardas;
@@ -207,7 +233,10 @@ vector<Duomenys<Container>> skaitytiDuomenisIsFailo()
         lineNum++;
         Duomenys<Container> studentas;
         istringstream iss(eile);
-        iss >> studentas.vardas >> studentas.pavarde;
+        string vardas, pavarde;
+        iss >> vardas >> pavarde;
+        studentas.setVardas(vardas);
+        studentas.setPavarde(pavarde);
 
         for (int i = 0; i < 7; i++)
         {
@@ -223,12 +252,14 @@ vector<Duomenys<Container>> skaitytiDuomenisIsFailo()
             {
                 break;
             }
-            studentas.nd.push_back(pazimys);
+            studentas.addScore(pazimys);
         }
 
         if (!iss.fail())
         {
-            iss >> studentas.egz;
+            int egz;
+            iss >> egz;
+            studentas.setEgz(egz);
             studentai.push_back(studentas);
         }
     }
@@ -379,8 +410,9 @@ void spausdintiDuomenis(const vector<Duomenys<Container>> &studentai)
 
     for (const Duomenys<Container> &studentas : studentai)
     {
-        cout << setw(15) << left << studentas.pavarde << setw(15) << left << studentas.vardas;
-        cout << setw(20) << left << round((0.4 * vidurkis(studentas.nd) + 0.6 * studentas.egz) * 100.0) / 100.0 << endl;
+
+        cout << setw(15) << left << studentas.getPavarde() << setw(15) << left << studentas.getVardas();
+        cout << setw(20) << left << round((0.4 * vidurkis(studentas.getNd()) + 0.6 * studentas.getEgz()) * 100.0) / 100.0 << endl;
     }
 }
 
@@ -462,7 +494,10 @@ void StudentuSkirstymas(const string &sortingCriteria, const string &StorageType
             lineNum++;
             Duomenys<Container> studentas;
             istringstream iss(eile);
-            iss >> studentas.vardas >> studentas.pavarde;
+            string vardas, pavarde;
+            iss >> vardas >> pavarde;
+            studentas.setVardas(vardas);
+            studentas.setPavarde(pavarde);
 
             for (int i = 0; i < 7; i++)
             {
@@ -478,12 +513,15 @@ void StudentuSkirstymas(const string &sortingCriteria, const string &StorageType
                 {
                     break;
                 }
-                studentas.nd.push_back(pazimys);
+
+                studentas.addScore(pazimys);
             }
 
             if (!iss.fail())
             {
-                iss >> studentas.egz;
+                int egz;
+                iss >> egz;
+                studentas.setEgz(egz);
                 studentai.push_back(studentas);
             }
         }
@@ -495,7 +533,8 @@ void StudentuSkirstymas(const string &sortingCriteria, const string &StorageType
 
         for (Duomenys<Container> &studentas : studentai)
         {
-            studentas.vid = round((0.4 * vidurkis(studentas.nd) + 0.6 * studentas.egz) * 100.0) / 100.0;
+            double vid = round((0.4 * vidurkis(studentas.getNd()) + 0.6 * studentas.getEgz()) * 100.0) / 100.0;
+            studentas.setVid(vid);
         }
         if (sortingCriteria == "p")
         {
@@ -527,7 +566,7 @@ void StudentuSkirstymas(const string &sortingCriteria, const string &StorageType
 
         auto partitionIt = partition(studentai.begin(), studentai.end(),
                                       [](const Duomenys<Container> &studentas) {
-                                          return studentas.vid < 5;
+                                          return studentas.getVid() < 5;
                                       });
 
         protingi.insert(protingi.end(), make_move_iterator(partitionIt), make_move_iterator(studentai.end()));
@@ -546,8 +585,8 @@ void StudentuSkirstymas(const string &sortingCriteria, const string &StorageType
 
         for (const Duomenys<Container> &studentas : studentai)
         {
-            Vargsiukai << setw(15) << left << studentas.vardas << setw(15) << left << studentas.pavarde
-                       << setw(20) << left << studentas.vid << setw(20) << endl;
+            Vargsiukai << setw(15) << left << studentas.getVardas() << setw(15) << left << studentas.getPavarde()
+                       << setw(20) << left << studentas.getVid() << setw(20) << endl;
         }
 
         Vargsiukai.close();
@@ -564,8 +603,8 @@ void StudentuSkirstymas(const string &sortingCriteria, const string &StorageType
 
         for (const Duomenys<Container> &studentas : protingi)
         {
-            Moksliukai << setw(15) << left << studentas.vardas << setw(15) << left << studentas.pavarde
-                       << setw(20) << left << studentas.vid << setw(20) << endl;
+            Moksliukai << setw(15) << left << studentas.getVardas() << setw(15) << left << studentas.getPavarde()
+                       << setw(20) << left << studentas.getVid() << setw(20) << endl;
         }
 
         Moksliukai.close();
@@ -597,7 +636,10 @@ void StudentuSkirstymas(const string &sortingCriteria, const string &StorageType
             lineNum++;
             Duomenys<Container> studentas;
             istringstream iss(eile);
-            iss >> studentas.vardas >> studentas.pavarde;
+            string vardas, pavarde;
+            iss >> vardas >> pavarde;
+            studentas.setVardas(vardas);
+            studentas.setPavarde(pavarde);
 
             for (int i = 0; i < 7; i++)
             {
@@ -613,12 +655,14 @@ void StudentuSkirstymas(const string &sortingCriteria, const string &StorageType
                 {
                     break;
                 }
-                studentas.nd.push_back(pazimys);
+                studentas.addScore(pazimys);
             }
 
             if (!iss.fail())
             {
-                iss >> studentas.egz;
+                int egz;
+                iss >> egz;
+                studentas.setEgz(egz);
                 studentai.push_back(studentas);
             }
         }
@@ -630,7 +674,8 @@ void StudentuSkirstymas(const string &sortingCriteria, const string &StorageType
 
         for (Duomenys<Container> &studentas : studentai)
         {
-            studentas.vid = round((0.4 * vidurkis(studentas.nd) + 0.6 * studentas.egz) * 100.0) / 100.0;
+            double vid = round((0.4 * vidurkis(studentas.getNd()) + 0.6 * studentas.getEgz()) * 100.0) / 100.0;
+            studentas.setVid(vid);
         }
 
         if (sortingCriteria == "p")
@@ -662,7 +707,7 @@ void StudentuSkirstymas(const string &sortingCriteria, const string &StorageType
 
         for (auto it = studentai.begin(); it != studentai.end();)
         {
-            if (it->vid < 5)
+            if (it->getVid() < 5)
             {
                 protingi.push_back(*it);
                 it = studentai.erase(it);
@@ -672,7 +717,6 @@ void StudentuSkirstymas(const string &sortingCriteria, const string &StorageType
                 ++it;
             }
         }
-
         auto endFilter = chrono::high_resolution_clock::now();
         chrono::duration<double> durationFilter = endFilter - startFilter;
         cout << "duomenu rusiavimas pagal vidurki truko " << durationFilter.count() << " sekundziu" << endl;
@@ -685,8 +729,8 @@ void StudentuSkirstymas(const string &sortingCriteria, const string &StorageType
 
         for (const Duomenys<Container> &studentas : studentai)
         {
-            Vargsiukai << setw(15) << left << studentas.vardas << setw(15) << left << studentas.pavarde
-                       << setw(20) << left << studentas.vid << setw(20) << endl;
+            Vargsiukai << setw(15) << left << studentas.getVardas() << setw(15) << left << studentas.getPavarde()
+                       << setw(20) << left << studentas.getVid() << setw(20) << endl;
         }
 
         Vargsiukai.close();
@@ -702,8 +746,8 @@ void StudentuSkirstymas(const string &sortingCriteria, const string &StorageType
 
     for (const Duomenys<Container> &studentas : studentai)
     {
-        Moksliukai << setw(15) << left << studentas.vardas << setw(15) << left << studentas.pavarde
-                   << setw(20) << left << studentas.vid << setw(20) << endl;
+        Moksliukai << setw(15) << left << studentas.getVardas() << setw(15) << left << studentas.getPavarde()
+                   << setw(20) << left << studentas.getVid() << setw(20) << endl;
     }
 
     Moksliukai.close();

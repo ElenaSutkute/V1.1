@@ -124,7 +124,7 @@ int main()
 
     if (containerType == "v")
     {
-        cout << "Ar generuoti failus?" << endl;
+        cout << "Ar generuoti failus? taip/ne" << endl;
         cin >> ats;
         if (ats == "taip")
         {
@@ -133,7 +133,7 @@ int main()
     }
     else if (containerType == "l")
     {
-        cout << "Ar generuoti failus?" << endl;
+        cout << "Ar generuoti failus? taip/ne" << endl;
         cin >> ats;
         if (ats == "taip")
         {
@@ -144,7 +144,7 @@ int main()
     string kriterijus;
     cout << "Ar rusiuoti studentus pagal vidurki ar pagal pavardes?(v/p)" << endl;
     cin >> kriterijus;
-    for (int i = 0; i < 3; i++)
+    for (int i = 0; i < 1; i++)
     {
         for (int i = 0; i < 48; i++)
         {
@@ -482,9 +482,9 @@ void StudentuSkirstymas(const string &sortingCriteria, const string &StorageType
     {
         vector<Duomenys<Container>> studentai;
 
-        ifstream infile("10000 studentu.txt");
+        ifstream infile("1000000 studentu.txt");
 
-        cout << "Skaitymas vyksta is failo su 10,000 studentu" << endl;
+        cout << "Skaitymas vyksta is failo su 1,000,000 studentu" << endl;
         cout << endl;
         if (!infile)
         {
@@ -582,7 +582,7 @@ void StudentuSkirstymas(const string &sortingCriteria, const string &StorageType
         auto endFilter = chrono::high_resolution_clock::now();
         chrono::duration<double> durationFilter = endFilter - startFilter;
 
-        cout << "duomenu rusiavimas paval vidurki truko " << durationFilter.count() << " sekundziu" << endl;
+        cout << "duomenu rusiavimas i failus paval vidurki truko " << durationFilter.count() << " sekundziu" << endl;
 
         auto startWriteVargsiukai = chrono::high_resolution_clock::now();
 
@@ -624,9 +624,9 @@ void StudentuSkirstymas(const string &sortingCriteria, const string &StorageType
     {
         list<Duomenys<Container>> studentai;
 
-        ifstream infile("10000 studentu.txt");
+        ifstream infile("1000000 studentu.txt");
 
-        cout << "Skaitymas vyksta is failo su 10,000 studentu" << endl;
+        cout << "Skaitymas vyksta is failo su 1,000,000 studentu" << endl;
         cout << endl;
         if (!infile)
         {
@@ -726,7 +726,7 @@ void StudentuSkirstymas(const string &sortingCriteria, const string &StorageType
         }
         auto endFilter = chrono::high_resolution_clock::now();
         chrono::duration<double> durationFilter = endFilter - startFilter;
-        cout << "duomenu rusiavimas pagal vidurki truko " << durationFilter.count() << " sekundziu" << endl;
+        cout << "duomenu rusiavimas i failus pagal vidurki truko " << durationFilter.count() << " sekundziu" << endl;
 
         auto startWriteVargsiukai = chrono::high_resolution_clock::now();
 

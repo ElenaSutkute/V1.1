@@ -82,6 +82,37 @@ public:
     }
 
 
+    friend std::istream& operator>>(std::istream& is, Duomenys& duomenys)
+    {
+        is >> duomenys.vardas >> duomenys.pavarde;
+
+        int pazymys;
+        while (is >> pazymys && pazymys != -1)
+        {
+            duomenys.addScore(pazymys);
+        }
+
+        is >> duomenys.egz;
+
+        return is;
+    }
+
+    friend std::ostream& operator<<(std::ostream& os, const Duomenys& duomenys)
+    {
+        os << std::setw(15) << std::left << duomenys.vardas
+           << std::setw(15) << std::left << duomenys.pavarde;
+
+        for (const auto& score : duomenys.nd)
+        {
+            os << std::setw(4) << std::right << score;
+        }
+
+        os << std::setw(4) << std::right << duomenys.egz;
+
+        return os;
+    }
+
+
 private:
     string vardas;
     string pavarde;

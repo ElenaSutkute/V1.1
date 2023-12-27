@@ -10,117 +10,150 @@
 #include <chrono>
 #include <type_traits>
 
+
 using namespace std;
 
-class Zmogus
-{
+class Zmogus {
 public:
-    
-    virtual ~Zmogus() = default;
+    virtual ~Zmogus() = default;  
+
     virtual string getVardas() const = 0;
     virtual string getPavarde() const = 0;
-    virtual int getEgz() const = 0;
-    virtual double getVid() const = 0;
-    virtual void SpausdintiInformacija() const = 0;
 
+    
 };
 
 template <typename Container>
-class Duomenys : public Zmogus
-{
+class Duomenys : public Zmogus {
 public:
-    Duomenys() : egz(0), vid(0), nd(nullptr) {}
-    ~Duomenys() { delete nd; }
-    Duomenys(const Duomenys& other);
-    Duomenys& operator=(const Duomenys& other);
-    Duomenys(Duomenys&& other) noexcept;
-    Duomenys& operator=(Duomenys&& other) noexcept;
+    Duomenys() : egz(0), vid(0.0) {}
 
-    void SpausdintiInformacija() const override;
+    Duomenys(const string &vardas, const string &pavarde, const Container &nd, int egz)
+        : vardas(vardas), pavarde(pavarde), nd(nd), egz(egz), vid(0.0) {}
 
+    Duomenys(const Duomenys &other)
+        : vardas(other.vardas), pavarde(other.pavarde), nd(other.nd), egz(other.egz), vid(other.vid), med(other.med) {}
+
+    Duomenys& operator=(const Duomenys &other)
+    {
+        if (this != &other)
+        {
+            vardas = other.vardas;
+            pavarde = other.pavarde;
+            nd = other.nd;
+            egz = other.egz;
+            vid = other.vid;
+            med = other.med;
+        }
+        return *this;
+    }
+
+    ~Duomenys(){}
+
+    string getVardas() const override {
+        return vardas;
+    }
+
+    string getPavarde() const override {
+        return pavarde;
+    }
+
+    const Container& getNd() const {
+        return nd;
+    }
+
+    int getEgz() const {
+        return egz;
+    }
+
+    double getVid() const {
+        return vid;
+    }
+
+    void setVardas(const string &newVardas) {
+        vardas = newVardas;
+    }
+
+    void setPavarde(const string &newPavarde) {
+        pavarde = newPavarde;
+    }
+
+    void setEgz(int newEgz) {
+        egz = newEgz;
+    }
+
+    void setVid(double newVid) {
+        vid = newVid;
+    }
+
+    void addScore(int score) {
+        nd.push_back(score);
+    }
+
+
+    friend std::istream& operator>>(std::istream& is, Duomenys& duomenys)
+    {
+        is >> duomenys.vardas >> duomenys.pavarde;
+
+        int pazymys;
+        while (is >> pazymys && pazymys != -1)
+        {
+            duomenys.addScore(pazymys);
+        }
+
+        is >> duomenys.egz;
+
+        return is;
+    }
+
+    friend std::ostream& operator<<(std::ostream& os, const Duomenys& duomenys)
+    {
+        os << std::setw(15) << std::left << duomenys.vardas
+           << std::setw(15) << std::left << duomenys.pavarde;
+
+        for (const auto& score : duomenys.nd)
+        {
+            os << std::setw(4) << std::right << score;
+        }
+
+        os << std::setw(4) << std::right << duomenys.egz;
+
+        return os;
+    }
+
+private:
     string vardas;
     string pavarde;
-    Container* nd;
+    Container nd;
     int egz;
-    double vid;
-
-    string getVardas() const override { return vardas; }
-    string getPavarde() const override { return pavarde; }
-    int getEgz() const override { return egz; }
-    double getVid() const override { return vid; }
+    double vid, med;
 };
-
-template <typename Container>
-Duomenys<Container>::Duomenys(const Duomenys& other)
-    : vardas(other.vardas), pavarde(other.pavarde), egz(other.egz),
-      vid(other.vid)
-{
-    nd = new Container(*(other.nd));
-}
-
-template <typename Container>
-Duomenys<Container>& Duomenys<Container>::operator=(const Duomenys& other)
-{
-    if (this != &other)
-    {
-        delete nd;
-        vardas = other.vardas;
-        pavarde = other.pavarde;
-        egz = other.egz;
-        vid = other.vid;
-        nd = new Container(*(other.nd));
-    }
-    return *this;
-}
-
-template <typename Container>
-Duomenys<Container>::Duomenys(Duomenys&& other) noexcept
-    : vardas(std::move(other.vardas)), pavarde(std::move(other.pavarde)),
-      egz(other.egz), vid(other.vid), nd(other.nd)
-{
-    other.nd = nullptr;
-}
-
-template <typename Container>
-Duomenys<Container>& Duomenys<Container>::operator=(Duomenys&& other) noexcept
-{
-    if (this != &other)
-    {
-        delete nd;
-        vardas = std::move(other.vardas);
-        pavarde = std::move(other.pavarde);
-        egz = other.egz;
-        vid = other.vid;
-        nd = other.nd;
-        other.nd = nullptr;
-    }
-    return *this;
-}
-
-
-template <typename Container>
-void Duomenys<Container>::SpausdintiInformacija() const
-{
-    cout << setw(15) << left << pavarde << setw(15) << left << vardas;
-}
 
 
 template <typename Container>
 vector<Duomenys<Container>> skaitytiDuomenisIsFailo();
+
 template <typename Container>
 void spausdintiDuomenis(const vector<Duomenys<Container>> &studentai);
+
 template <typename Container>
 vector<Duomenys<Container>> ivestiDuomenisRanka();
+
 template <typename Container>
 void StudentuSkirstymas(const string &sortingCriteria, const string &StorageType);
+
 template <typename Container>
 void GeneruotiFailus();
+
 template <typename Container>
 double vidurkis(const Container &vektorius);
+
 template <typename Container>
 bool rusiavimas(const Duomenys<Container> &a, const Duomenys<Container> &b);
+
 template <typename Container>
 void SortStudentsByGalutinis(vector<Duomenys<Container>> &students);
+
 template <typename Container>
 void SortStudentsByGalutinisList(list<Duomenys<Container>> &students);
 
@@ -139,7 +172,7 @@ int main()
             throw runtime_error("Error. Pasirinkite 'v' arba 'l'");
         }
     }
-    catch (const runtime_error& e)
+    catch (const runtime_error &e)
     {
         cerr << e.what() << endl;
         exit(EXIT_FAILURE);
@@ -199,7 +232,7 @@ int main()
             throw runtime_error("Error. Veskite tik 'taip' arba 'ne'");
         }
     }
-    catch (const runtime_error& e)
+    catch (const runtime_error &e)
     {
         cerr << e.what() << endl;
         exit(EXIT_FAILURE);
@@ -235,11 +268,11 @@ int main()
     return 0;
 }
 
+
 template <typename Container>
 vector<Duomenys<Container>> skaitytiDuomenisIsFailo()
 {
     vector<Duomenys<Container>> studentai;
-
 
     ifstream infile("studentai.txt");
     if (!infile.is_open())
@@ -255,9 +288,11 @@ vector<Duomenys<Container>> skaitytiDuomenisIsFailo()
     {
         lineNum++;
         Duomenys<Container> studentas;
-        studentas.nd = new Container();
         istringstream iss(eile);
-        iss >> studentas.vardas >> studentas.pavarde;
+        string vardas, pavarde;
+        iss >> vardas >> pavarde;
+        studentas.setVardas(vardas);
+        studentas.setPavarde(pavarde);
 
         for (int i = 0; i < 7; i++)
         {
@@ -273,12 +308,14 @@ vector<Duomenys<Container>> skaitytiDuomenisIsFailo()
             {
                 break;
             }
-            studentas.nd->push_back(pazimys);
+            studentas.addScore(pazimys);
         }
 
         if (!iss.fail())
         {
-            iss >> studentas.egz;
+            int egz;
+            iss >> egz;
+            studentas.setEgz(egz);
             studentai.push_back(studentas);
         }
     }
@@ -313,12 +350,15 @@ vector<Duomenys<Container>> ivestiDuomenisRanka()
     for (int studentIndex = 0; studentIndex < zmones; studentIndex++)
     {
         Duomenys<Container> studentas;
-        studentas.nd = new Container();
+
+        string vardas, pavarde;
 
         cout << "Iveskite varda: ";
-        cin >> studentas.vardas;
+        cin >> vardas;
+        studentas.setVardas(vardas);
         cout << "Iveskite pavarde: ";
-        cin >> studentas.pavarde;
+        cin >> pavarde;
+        studentas.setPavarde(pavarde);
 
         cout << "Ar norite ivesti savo pazymius? Atsakymas: taip arba ne" << endl;
         try
@@ -356,12 +396,14 @@ vector<Duomenys<Container>> ivestiDuomenisRanka()
                 {
                     cerr << e.what() << endl;
                 }
-                studentas.nd->push_back(pazimys);
+                studentas.addScore(pazimys);
             }
             cout << "Iveskite egzamino rezultata: ";
             try
             {
-                cin >> studentas.egz;
+                int egz;
+                cin >> egz;
+                studentas.setEgz(egz);
                 if (cin.fail())
                 {
                     cin.clear();
@@ -403,12 +445,13 @@ vector<Duomenys<Container>> ivestiDuomenisRanka()
             {
                 uniform_int_distribution<int> distribution(min, max);
                 int random_skaicius = distribution(generator);
-                studentas.nd->push_back(random_skaicius);
+                studentas.addScore(random_skaicius);
                 cout << random_skaicius << endl;
             }
             uniform_int_distribution<int> distribution(min, max);
-            studentas.egz = distribution(generator);
-            cout << "Egzamino pazimys: " << studentas.egz << endl;
+            int egz = distribution(generator);
+            studentas.setEgz(egz);
+            cout << "Egzamino pazimys: " << studentas.getEgz() << endl;
         }
 
         studentai.push_back(studentas);
@@ -430,12 +473,11 @@ void spausdintiDuomenis(const vector<Duomenys<Container>> &studentai)
 
     for (const Duomenys<Container> &studentas : studentai)
     {
-        studentas.SpausdintiInformacija();
-        cout << setw(20) << left << round((0.4 * vidurkis(studentas.nd) + 0.6 * studentas.egz) * 100.0) / 100.0 << endl;
+
+        cout << setw(15) << left << studentas.getPavarde() << setw(15) << left << studentas.getVardas();
+        cout << setw(20) << left << round((0.4 * vidurkis(studentas.getNd()) + 0.6 * studentas.getEgz()) * 100.0) / 100.0 << endl;
     }
 }
-
-
 
 template <typename Container>
 void GeneruotiFailus()
@@ -514,9 +556,11 @@ void StudentuSkirstymas(const string &sortingCriteria, const string &StorageType
         {
             lineNum++;
             Duomenys<Container> studentas;
-            studentas.nd = new Container();
             istringstream iss(eile);
-            iss >> studentas.vardas >> studentas.pavarde;
+            string vardas, pavarde;
+            iss >> vardas >> pavarde;
+            studentas.setVardas(vardas);
+            studentas.setPavarde(pavarde);
 
             for (int i = 0; i < 7; i++)
             {
@@ -532,12 +576,15 @@ void StudentuSkirstymas(const string &sortingCriteria, const string &StorageType
                 {
                     break;
                 }
-                studentas.nd->push_back(pazimys);
+
+                studentas.addScore(pazimys);
             }
 
             if (!iss.fail())
             {
-                iss >> studentas.egz;
+                int egz;
+                iss >> egz;
+                studentas.setEgz(egz);
                 studentai.push_back(studentas);
             }
         }
@@ -549,7 +596,8 @@ void StudentuSkirstymas(const string &sortingCriteria, const string &StorageType
 
         for (Duomenys<Container> &studentas : studentai)
         {
-            studentas.vid = round((0.4 * vidurkis(studentas.nd) + 0.6 * studentas.egz) * 100.0) / 100.0;
+            double vid = round((0.4 * vidurkis(studentas.getNd()) + 0.6 * studentas.getEgz()) * 100.0) / 100.0;
+            studentas.setVid(vid);
         }
         if (sortingCriteria == "p")
         {
@@ -581,16 +629,17 @@ void StudentuSkirstymas(const string &sortingCriteria, const string &StorageType
 
         auto partitionIt = partition(studentai.begin(), studentai.end(),
                                       [](const Duomenys<Container> &studentas) {
-                                          return studentas.vid < 5;
+                                          return studentas.getVid() < 5;
                                       });
 
         protingi.insert(protingi.end(), make_move_iterator(partitionIt), make_move_iterator(studentai.end()));
         studentai.erase(partitionIt, studentai.end());
+        SortStudentsByGalutinis<Container>(protingi);
 
         auto endFilter = chrono::high_resolution_clock::now();
         chrono::duration<double> durationFilter = endFilter - startFilter;
 
-        cout << "duomenu rusiavimas paval vidurki truko " << durationFilter.count() << " sekundziu" << endl;
+        cout << "duomenu rusiavimas i failus paval vidurki truko " << durationFilter.count() << " sekundziu" << endl;
 
         auto startWriteVargsiukai = chrono::high_resolution_clock::now();
 
@@ -600,8 +649,8 @@ void StudentuSkirstymas(const string &sortingCriteria, const string &StorageType
 
         for (const Duomenys<Container> &studentas : studentai)
         {
-            Vargsiukai << setw(15) << left << studentas.vardas << setw(15) << left << studentas.pavarde
-                       << setw(20) << left << studentas.vid << setw(20) << endl;
+            Vargsiukai << setw(15) << left << studentas.getVardas() << setw(15) << left << studentas.getPavarde()
+                       << setw(20) << left << studentas.getVid() << setw(20) << endl;
         }
 
         Vargsiukai.close();
@@ -618,8 +667,8 @@ void StudentuSkirstymas(const string &sortingCriteria, const string &StorageType
 
         for (const Duomenys<Container> &studentas : protingi)
         {
-            Moksliukai << setw(15) << left << studentas.vardas << setw(15) << left << studentas.pavarde
-                       << setw(20) << left << studentas.vid << setw(20) << endl;
+            Moksliukai << setw(15) << left << studentas.getVardas() << setw(15) << left << studentas.getPavarde()
+                       << setw(20) << left << studentas.getVid() << setw(20) << endl;
         }
 
         Moksliukai.close();
@@ -650,9 +699,11 @@ void StudentuSkirstymas(const string &sortingCriteria, const string &StorageType
         {
             lineNum++;
             Duomenys<Container> studentas;
-            studentas.nd = new Container();
             istringstream iss(eile);
-            iss >> studentas.vardas >> studentas.pavarde;
+            string vardas, pavarde;
+            iss >> vardas >> pavarde;
+            studentas.setVardas(vardas);
+            studentas.setPavarde(pavarde);
 
             for (int i = 0; i < 7; i++)
             {
@@ -668,12 +719,14 @@ void StudentuSkirstymas(const string &sortingCriteria, const string &StorageType
                 {
                     break;
                 }
-                studentas.nd->push_back(pazimys);
+                studentas.addScore(pazimys);
             }
 
             if (!iss.fail())
             {
-                iss >> studentas.egz;
+                int egz;
+                iss >> egz;
+                studentas.setEgz(egz);
                 studentai.push_back(studentas);
             }
         }
@@ -685,7 +738,8 @@ void StudentuSkirstymas(const string &sortingCriteria, const string &StorageType
 
         for (Duomenys<Container> &studentas : studentai)
         {
-            studentas.vid = round((0.4 * vidurkis(studentas.nd) + 0.6 * studentas.egz) * 100.0) / 100.0;
+            double vid = round((0.4 * vidurkis(studentas.getNd()) + 0.6 * studentas.getEgz()) * 100.0) / 100.0;
+            studentas.setVid(vid);
         }
 
         if (sortingCriteria == "p")
@@ -715,22 +769,18 @@ void StudentuSkirstymas(const string &sortingCriteria, const string &StorageType
 
         auto startFilter = chrono::high_resolution_clock::now();
 
-        for (auto it = studentai.begin(); it != studentai.end();)
-        {
-            if (it->vid < 5)
-            {
-                protingi.push_back(*it);
-                it = studentai.erase(it);
-            }
-            else
-            {
-                ++it;
-            }
-        }
+        auto partitionIt = partition(studentai.begin(), studentai.end(),
+                                      [](const Duomenys<Container> &studentas) {
+                                          return studentas.getVid() >= 5;
+                                      });
+
+        protingi.insert(protingi.end(), make_move_iterator(partitionIt), make_move_iterator(studentai.end()));
+        studentai.erase(partitionIt, studentai.end());
+        SortStudentsByGalutinisList<Container>(protingi);
 
         auto endFilter = chrono::high_resolution_clock::now();
         chrono::duration<double> durationFilter = endFilter - startFilter;
-        cout << "duomenu rusiavimas pagal vidurki truko " << durationFilter.count() << " sekundziu" << endl;
+        cout << "duomenu rusiavimas i failus pagal vidurki truko " << durationFilter.count() << " sekundziu" << endl;
 
         auto startWriteVargsiukai = chrono::high_resolution_clock::now();
 
@@ -740,8 +790,8 @@ void StudentuSkirstymas(const string &sortingCriteria, const string &StorageType
 
         for (const Duomenys<Container> &studentas : protingi)
         {
-            Vargsiukai << setw(15) << left << studentas.vardas << setw(15) << left << studentas.pavarde
-                       << setw(20) << left << studentas.vid << setw(20) << endl;
+            Vargsiukai << setw(15) << left << studentas.getVardas() << setw(15) << left << studentas.getPavarde()
+                       << setw(20) << left << studentas.getVid() << setw(20) << endl;
         }
 
         Vargsiukai.close();
@@ -757,8 +807,8 @@ void StudentuSkirstymas(const string &sortingCriteria, const string &StorageType
 
     for (const Duomenys<Container> &studentas : studentai)
     {
-        Moksliukai << setw(15) << left << studentas.vardas << setw(15) << left << studentas.pavarde
-                   << setw(20) << left << studentas.vid << setw(20) << endl;
+        Moksliukai << setw(15) << left << studentas.getVardas() << setw(15) << left << studentas.getPavarde()
+                   << setw(20) << left << studentas.getVid() << setw(20) << endl;
     }
 
     Moksliukai.close();
@@ -778,9 +828,7 @@ double vidurkis(const Container &vektorius)
     double suma = 0.0;
     int kiekis = 0;
 
-    const auto& actualContainer = *vektorius;
-
-    for (const auto &element : actualContainer)
+    for (const auto &element : vektorius)
     {
         suma += element;
         kiekis++;
@@ -799,10 +847,10 @@ double vidurkis(const Container &vektorius)
 template <typename Container>
 bool rusiavimas(const Duomenys<Container> &a, const Duomenys<Container> &b)
 {
-    string vardas1 = a.vardas;
-    string vardas2 = b.vardas;
-    string pavarde1 = a.pavarde;
-    string pavarde2 = b.pavarde;
+    string vardas1 = a.getVardas();
+    string vardas2 = b.getVardas();
+    string pavarde1 = a.getPavarde();
+    string pavarde2 = b.getPavarde();
 
     if (vardas1 == vardas2)
     {
@@ -816,7 +864,7 @@ template <typename Container>
 void SortStudentsByGalutinis(vector<Duomenys<Container>> &students)
 {
     sort(students.begin(), students.end(), [](const Duomenys<Container> &a, const Duomenys<Container> &b) {
-        return (vidurkis(a.nd) * 0.4 + a.egz * 0.6) < (vidurkis(b.nd) * 0.4 + b.egz * 0.6);
+        return (vidurkis(a.getNd()) * 0.4 + a.getEgz() * 0.6) > (vidurkis(b.getNd()) * 0.4 + b.getEgz() * 0.6);
     });
 }
 
@@ -824,6 +872,6 @@ template <typename Container>
 void SortStudentsByGalutinisList(list<Duomenys<Container>> &students)
 {
     students.sort([](const Duomenys<Container> &a, const Duomenys<Container> &b) {
-        return (vidurkis(a.nd) * 0.4 + a.egz * 0.6) < (vidurkis(b.nd) * 0.4 + b.egz * 0.6);
+        return (vidurkis(a.getNd()) * 0.4 + a.getEgz() * 0.6) > (vidurkis(b.getNd()) * 0.4 + b.getEgz() * 0.6);
     });
 }

@@ -152,6 +152,30 @@ void SortStudentsByGalutinisList(list<Duomenys<Container>> &students);
 
 int main()
 {
+    Duomenys<vector<int>> duomenys1("Ana", "Jonaityte", {9, 8, 7}, 9);
+
+    Duomenys<vector<int>> duomenys2 = duomenys1;
+    cout << "kopijavimo konstruktorius kopijuojant duomenys1, isvedama duomenys2 rezultatas:" << endl;
+    cout << duomenys2 << endl;
+    cout << "----------------------------------------" << endl;
+
+    Duomenys<vector<int>> duomenys3;
+    duomenys3 = duomenys1;
+    cout << "kopijavimo priskyrimo operatorius, isvedama duomenys3 rezultatas:" << endl;
+    cout << duomenys3 << endl;
+    cout << "----------------------------------------" << endl;
+
+        Duomenys<vector<int>> duomenys;
+
+    cout << "Iveskite duomenis formatu vardas, pavarde, pazymys1 pazymys2(norint nutraukti ivedima veskite -1), egz):" << endl;
+    cin >> duomenys;
+    cout << "----------------------------------------" << endl;
+
+    cout << "Rezultatas:" << endl;
+    cout << duomenys << endl;
+    cout << "----------------------------------------" << endl;
+
+
     string ats;
     string containerType;
     cout << "Ar naudoti vector ar list? (v/l)" << endl;
@@ -626,11 +650,12 @@ void StudentuSkirstymas(const string &sortingCriteria, const string &StorageType
 
         protingi.insert(protingi.end(), make_move_iterator(partitionIt), make_move_iterator(studentai.end()));
         studentai.erase(partitionIt, studentai.end());
+        SortStudentsByGalutinis<Container>(protingi);
 
         auto endFilter = chrono::high_resolution_clock::now();
         chrono::duration<double> durationFilter = endFilter - startFilter;
 
-        cout << "duomenu rusiavimas paval vidurki truko " << durationFilter.count() << " sekundziu" << endl;
+        cout << "duomenu rusiavimas i failus paval vidurki truko " << durationFilter.count() << " sekundziu" << endl;
 
         auto startWriteVargsiukai = chrono::high_resolution_clock::now();
 
@@ -760,21 +785,18 @@ void StudentuSkirstymas(const string &sortingCriteria, const string &StorageType
 
         auto startFilter = chrono::high_resolution_clock::now();
 
-        for (auto it = studentai.begin(); it != studentai.end();)
-        {
-            if (it->getVid() < 5)
-            {
-                protingi.push_back(*it);
-                it = studentai.erase(it);
-            }
-            else
-            {
-                ++it;
-            }
-        }
+        auto partitionIt = partition(studentai.begin(), studentai.end(),
+                                      [](const Duomenys<Container> &studentas) {
+                                          return studentas.getVid() >= 5;
+                                      });
+
+        protingi.insert(protingi.end(), make_move_iterator(partitionIt), make_move_iterator(studentai.end()));
+        studentai.erase(partitionIt, studentai.end());
+        SortStudentsByGalutinisList<Container>(protingi);
+
         auto endFilter = chrono::high_resolution_clock::now();
         chrono::duration<double> durationFilter = endFilter - startFilter;
-        cout << "duomenu rusiavimas pagal vidurki truko " << durationFilter.count() << " sekundziu" << endl;
+        cout << "duomenu rusiavimas i failus pagal vidurki truko " << durationFilter.count() << " sekundziu" << endl;
 
         auto startWriteVargsiukai = chrono::high_resolution_clock::now();
 
@@ -782,7 +804,7 @@ void StudentuSkirstymas(const string &sortingCriteria, const string &StorageType
         Vargsiukai << setw(15) << left << "Vardas" << setw(15) << left << "Pavarde"
                    << setw(20) << left << "Galutinis(Vid.)" << setw(20) << endl;
 
-        for (const Duomenys<Container> &studentas : studentai)
+        for (const Duomenys<Container> &studentas : protingi)
         {
             Vargsiukai << setw(15) << left << studentas.getVardas() << setw(15) << left << studentas.getPavarde()
                        << setw(20) << left << studentas.getVid() << setw(20) << endl;

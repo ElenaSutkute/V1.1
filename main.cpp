@@ -15,12 +15,12 @@ using namespace std;
 
 class Zmogus {
 public:
-    virtual ~Zmogus() = default;  
+    virtual ~Zmogus() = default;
 
     virtual string getVardas() const = 0;
     virtual string getPavarde() const = 0;
 
-    
+
 };
 
 template <typename Container>
@@ -160,6 +160,34 @@ void SortStudentsByGalutinisList(list<Duomenys<Container>> &students);
 
 int main()
 {
+    //Zmogus zmogus;
+
+
+    Duomenys<vector<int>> duomenys1("Ana", "Jonaityte", {9, 8, 7}, 9);
+
+    Duomenys<vector<int>> duomenys2 = duomenys1;
+    cout << "kopijavimo konstruktorius kopijuojant duomenys1, isvedama duomenys2 rezultatas:" << endl;
+    cout << duomenys2 << endl;
+    cout << "----------------------------------------" << endl;
+
+    Duomenys<vector<int>> duomenys3;
+    duomenys3 = duomenys1;
+    cout << "kopijavimo priskyrimo operatorius, isvedama duomenys3 rezultatas:" << endl;
+    cout << duomenys3 << endl;
+    cout << "----------------------------------------" << endl;
+
+        Duomenys<vector<int>> duomenys;
+
+    cout << "Iveskite duomenis formatu vardas, pavarde, pazymys1 pazymys2(norint nutraukti ivedima veskite -1), egz):" << endl;
+    cin >> duomenys;
+    cout << "----------------------------------------" << endl;
+
+    cout << "Rezultatas:" << endl;
+    cout << duomenys << endl;
+    cout << "----------------------------------------" << endl;
+
+
+
     string ats;
     string containerType;
     cout << "Ar naudoti vector ar list? (v/l)" << endl;

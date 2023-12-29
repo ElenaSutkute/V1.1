@@ -14,7 +14,9 @@ Naudojimasis kodu:
      3.2.1. Tuomet reikia įvesti studento vardą bei pavardę.
    
      3.2.2. Klausiama ar norite įvesti studento pažymius bei egzamino rezutatą ranka, ar kad kompiuteris juos sugeneruotų automatiškai. Galimi įvedimo rezultatai taip arba ne.
+   
      3.2.2.1. Įvedus taip galite vesti kiek norite studento pažymių, norėdami nutraukti įvedimą parašykite -1; Tuomet reikia įvesti egzamino rezultatą. Rezultatai būtinai turi būtų (0,10] ribose.
+   
      3.2.2.2. Įvedus ne reikia pasirinkti kiek buvo atliktų namų darbų ir tada studento namų darbų ir egzamino rezultatai bus generuojami automatiškai.
 Galutiniame rezultate matysime studentų pavades ir vardus surūšiuotus abeceliškai ir jų galutinį dalyko rezutatą, paskaičiuotą tiek pagal medianą, tiek pagal vidurkį.
 

@@ -1,4 +1,5 @@
 Šiame darbe buvo atliktas "rule-of-three". Štai pagrindiniai pakitimai, užtikrinantys taisyklės realizavimą:
+
 Yra destruktorius.
 
 Kopijavimo Konstruktorius: 

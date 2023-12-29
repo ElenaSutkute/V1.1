@@ -10,7 +10,7 @@ Naudojimasis kodu:
 
 # 2.0
 
-Kodui pridėta dokumentacija Doxygen aplankale html. Apie kodo funkcionavimą galite pasiskaityti aksteniose versijose.
+Kodui pridėta dokumentacija Doxygen aplankale html.
 
 # 1.5
 

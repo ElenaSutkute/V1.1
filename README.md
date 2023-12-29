@@ -3,18 +3,18 @@
     Yra destruktorius;
 
     Kopijavimo Konstruktorius: 
-        atlieka gilų Container objekto kopijavimą, priskiria naują atmintį nukopijuotam objektui; 
+    atlieka gilų Container objekto kopijavimą, priskiria naują atmintį nukopijuotam objektui; 
 
     Kopijavimo Priskyrimo Operatorius: 
     atlaisvina esamus išteklius ir atlieka gilų Container objekto kopijavimą; 
 
 
     Taip pat pridėti:
-        įvesties operatorius:
-            nuskaito įvedamus kintamuosius vardas, pavarde, pažymys. Pažymys yra vedamas tol, kol neįvedama -1, visi nuskaityti pažymiai yra kaupiamu nd konteineryje pasitelkus addScore, tada yra nuskaitomas egzamino pažymys.
+    įvesties operatorius:
+    nuskaito įvedamus kintamuosius vardas, pavarde, pažymys. Pažymys yra vedamas tol, kol neįvedama -1, visi nuskaityti pažymiai yra kaupiamu nd konteineryje pasitelkus addScore, tada yra nuskaitomas egzamino pažymys.
         
-        išvesties operatorius: 
-            išveda duomenis, surašytus pasitelkus įvesties operatorių. 
+    išvesties operatorius: 
+    išveda duomenis, surašytus pasitelkus įvesties operatorių. 
 
 
 Pademonstruotas įvedimo metodas:

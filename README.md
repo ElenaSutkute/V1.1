@@ -11,7 +11,7 @@
 
     Taip pat pridėti:
         įvesties operatorius:
-            nuskaito įvedamus kintamuosius vardas, pavarde, pažymys. Pažymys yra vedamas tol, kol neįvedama -1, visi nuskaityti pažymiai yra kaupiamu nd konteineryje                         pasitelkus addScore, tada yra nuskaitomas egzamino pažymys.
+            nuskaito įvedamus kintamuosius vardas, pavarde, pažymys. Pažymys yra vedamas tol, kol neįvedama -1, visi nuskaityti pažymiai yra kaupiamu nd konteineryje pasitelkus addScore, tada yra nuskaitomas egzamino pažymys.
         
         išvesties operatorius: 
             išveda duomenis, surašytus pasitelkus įvesties operatorių. 
